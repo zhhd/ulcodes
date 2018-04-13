@@ -114,49 +114,52 @@ class Mysql implements MysqlInterface
 
     /**
      * 删除数据
-     * @param string       $query  sql语句
-     * @param array | null $params 参数
-     * @return int 影响条数
+     *
+     * @param string     $query  查询语句
+     * @param null|array $params 参数
+     * @return int
      */
     public function delete($query, $params = null)
     {
         $this->lastSql($query, $params);
         $sQuery = $this->pdo->prepare($query);
         $sQuery->execute($params);
-
         return $sQuery->rowCount();
     }
 
+
     /**
      * 插入数据
-     * @param string       $query  sql语句
-     * @param array | null $params 参数
-     * @return int 插入的id
+     *
+     * @param string     $query    查询语句
+     * @param null|array $params   参数
+     * @param bool       $returnId 是否返回最后一次插入的id
+     * @return int
      */
-    public function insert($query, $params = null)
+    public function insert($query, $params = null, $returnId = true)
     {
         $this->lastSql($query, $params);
         $sQuery = $this->pdo->prepare($query);
         $sQuery->execute($params);
-
-        if ($sQuery->rowCount() > 0) {
+        $rowCount = $sQuery->rowCount();
+        if ($rowCount > 0 && $returnId) {
             return $this->lastInsertId();
         } else {
-            return null;
+            return $rowCount;
         }
     }
 
     /**
-     * 返回最后一次sql
+     * 设置和获取最后一次执行SQL
      *
-     * @param null $query
-     * @param null $params
-     * @return mixed
+     * @param string|null $query  查询语句
+     * @param array|null  $params 参数
+     * @return string
      */
     public function lastSql($query = null, $params = null)
     {
         if ($query !== null) {
-            $this->_last_sql = sprintf('[%s][%s]', $query, Helper::json($params));
+            $this->_last_sql = sprintf('[SQL]::%s[Prams]::%s', $query, Helper::json($params));
         }
         return $this->_last_sql;
     }

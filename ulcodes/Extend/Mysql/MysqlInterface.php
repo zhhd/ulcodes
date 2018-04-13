@@ -63,7 +63,7 @@ interface MysqlInterface
      *          where("name='张三' and sex=1");   //  AND (name='张三' and sex=1)
      *          where(['name'=>['张三','李四'],'sex'=>1],'OR');   //  OR (`name` in ('张三','李四') and sex=1)
      */
-    public function where($where, $op = WHERE_AND);
+    public function where($where, $op = 'AND');
 
     /**
      * 添加and条件
@@ -144,7 +144,7 @@ interface MysqlInterface
      *
      * @see MysqlInterface::where() 说明
      */
-    public function having($having, $op = WHERE_AND);
+    public function having($having, $op = 'AND');
 
     /**
      * INNER JOIN <table> ON
@@ -152,13 +152,14 @@ interface MysqlInterface
      * @param string       $table   表名
      * @param string|array $on
      * @param string|null  $bytable 别名
+     * @param string       $mode    链接模式
      * @return $this
      *
      * @example join("clazz",["a.id = b.aid","a.i = b.i"],"b"); // INNER JOIN `clazz` as b ON a.id = b.aid AND a.i = b.i
      *          join("clazz","a.id = b.aid","b"); // INNER JOIN `clazz` as b ON a.id = b.aid
      *
      */
-    public function join($table, $on, $bytable = null);
+    public function join($table, $on, $bytable = null, $mode = 'INNER JOIN');
 
     /**
      * LEFT JOIN <table> ON
@@ -187,13 +188,38 @@ interface MysqlInterface
     /**
      * SET <field1> = <value1>,<field2> = <value2>,...
      *
-     * @param string|array $set
+     * @param string|array $updateSet
      * @return $this
      *
      * @example set(['name'=>'张三','sex'=>1])   // SET `name`='张三',`sex`=1
      *          set("name='张三',set=1")         // SET name='张三',sex=1
      */
-    public function set($set);
+    public function updateSet($updateSet);
+
+    /**
+     * 插入列
+     * INSERT INTO <TABLE> (<FILED>) VALUES (<VALUES>)
+     *
+     * @param string|array $field
+     * @return $this
+     *
+     * @example insertFiled('name,sex')         // INSERT INTO <TABLE> ('name,sex') VALUES (<VALUES>)
+     *          insertFiled(['name','sex'])     // INSERT INTO <TABLE> ('`name`,`sex`') VALUES (<VALUES>)
+     */
+    public function insertField($field);
+
+    /**
+     * 插入值
+     * INSERT INTO <TABLE> (<FILED>) VALUES (<VALUES>)
+     *
+     * @param string|array $values
+     * @param bool         $one
+     * @return $this
+     *
+     * @example insertValues(['张三','1'], true)      // INSERT INTO <TABLE> (<FILED>) VALUES ('张三','1')
+     *          insertValues("'张三','1'", true)      // INSERT INTO <TABLE> (<FILED>) VALUES ('张三','1')
+     *          insertValues([['张三','1'],['李四','2']], false)      // INSERT INTO <TABLE> (<FILED>) VALUES
+     *          ('张三','1'),('李四','2')
+     */
+    public function insertValues($values, $one = true);
 }
-const WHERE_AND = 'AND';
-const WHERE_OR  = 'OR';

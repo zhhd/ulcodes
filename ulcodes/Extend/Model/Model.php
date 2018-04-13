@@ -9,10 +9,10 @@
 namespace ulcodes\Extend\Model;
 
 
+
 class Model
 {
     public function __construct($mysql)
     {
-
     }
 }
